@@ -1,0 +1,36 @@
+{
+  "name": "glowing-octo-dollop",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "glowing-octo-dollop.",
+  "repository": "https://github.com/italosvieira/glowing-octo-dollop",
+  "author": {
+    "name": "Ítalo Da Silva Vieira",
+    "email": "italo.vieira.dev@gmail.com",
+    "url": "https://github.com/italosvieira"
+  },
+  "scripts": {
+    "start": "ts-node -r tsconfig-paths/register src/server.ts",
+    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "install-prod": "rm -rf node_modules && npm install --only=prod"
+  },
+  "dependencies": {
+    "@nestjs/common": "6.5.3",
+    "@nestjs/core": "6.5.3",
+    "@nestjs/platform-express": "6.5.3",
+    "fs-extra": "^8.1.0",
+    "proper-lockfile": "^4.1.1",
+    "reflect-metadata": "0.1.13",
+    "rxjs": "6.5.2"
+  },
+  "devDependencies": {
+    "@types/proper-lockfile": "^4.1.1",
+    "@types/fs-extra": "^8.0.0",
+    "@types/node": "11.13.4",
+    "ts-node": "8.1.0",
+    "tsconfig-paths": "3.8.0",
+    "tslint": "5.16.0",
+    "typescript": "3.4.3"
+  }
+}
