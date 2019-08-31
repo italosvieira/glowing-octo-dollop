@@ -1,8 +1,11 @@
+import * as path from 'path';
+import  * as moment from 'moment';
 import {Injectable, Logger} from '@nestjs/common';
 import {RegraAtendimento} from './regra-atendimento.model';
 import {appendFile, readFile, truncate} from 'fs-extra';
 import {check, lock, unlock} from 'proper-lockfile';
-import * as path from 'path';
+import {Intervalo} from './intervalos-regra-atendimento';
+import {Horario} from './horario-regra-atendimento.model';
 
 @Injectable()
 export class RegraAtendimentoService {
@@ -19,16 +22,95 @@ export class RegraAtendimentoService {
         });
     }
 
+    async findByIntervalo(intervalo: Intervalo) {
+        return check(this.caminhoArquivoBanco).then(async (isLocked) => {
+            if (!isLocked) {
+                const listaAtendimentos = await this.lerBanco();
+                const listaRetorno = new Array<Horario>();
+
+                if (listaAtendimentos) {
+                    for (let regraAtendimento of listaAtendimentos) {
+                        if (regraAtendimento.tipoRegraAtendimento === 'D') {
+                            delete regraAtendimento.horario.diasDisponiveis;
+                            listaRetorno.push(regraAtendimento.horario);
+                        } else if (regraAtendimento.tipoRegraAtendimento === 'S') {
+                            const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY').isoWeekday();
+                            const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY').isoWeekday();
+
+                            for (let diaDaSemana of regraAtendimento.horario.diasDisponiveis) {
+                                if (diaDaSemana >= diaDaSemanaInicio && diaDaSemana <= diaDaSemanaFim) {
+                                    delete regraAtendimento.horario.diasDisponiveis;
+                                    listaRetorno.push(regraAtendimento.horario);
+                                    break;
+                                }
+                            }
+                        } else if (regraAtendimento.tipoRegraAtendimento === 'U') {
+                            if (moment(regraAtendimento.horario.dia, 'DD-MM-YYYY').isBetween(moment(intervalo.inicio, 'DD-MM-YYYY'),
+                                moment(intervalo.fim, 'DD-MM-YYYY'), 'days', '[]')) {
+                                delete regraAtendimento.horario.diasDisponiveis;
+                                listaRetorno.push(regraAtendimento.horario);
+                            }
+                        }
+                    }
+                }
+
+                return listaRetorno;
+            } else {
+                return new Array<RegraAtendimento>();
+            }
+        });
+    }
+
     async save(regraAtendimento: RegraAtendimento) {
         return lock(this.caminhoArquivoBanco).then(async () => {
-            let msg;
+            let msg = '';
 
             if (!regraAtendimento.nomeDaRegra) {
-                msg = 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem o nome da regra.';
+                msg = msg + ' Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem o nome da regra.';
             }
 
-            if (!regraAtendimento.tipoAtendimento) {
-                msg = 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem o tipo de atendimento.';
+            if (!regraAtendimento.tipoRegraAtendimento) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem o tipo de atendimento.';
+            }
+
+            if (regraAtendimento.tipoRegraAtendimento !== 'U' && regraAtendimento.tipoRegraAtendimento !== 'D' &&
+                regraAtendimento.tipoRegraAtendimento !== 'S') {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento com o tipo de atendimento inválido.';
+            }
+
+            if (!regraAtendimento.horario) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem horário.';
+            }
+
+            if (regraAtendimento.tipoRegraAtendimento === 'U' && !regraAtendimento.horario.dia) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento para um dia específico sem o dia.';
+            }
+
+            if (regraAtendimento.tipoRegraAtendimento === 'U' && !moment(regraAtendimento.horario.dia, 'DD-MM-YYYY').isValid()) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento com a data do dia inválida.';
+            }
+
+            if (regraAtendimento.tipoRegraAtendimento === 'S' && regraAtendimento.horario.diasDisponiveis.length < 1) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento semanal sem os dias da semana.';
+            }
+
+            if (regraAtendimento.tipoRegraAtendimento === 'S' && regraAtendimento.horario.diasDisponiveis.length > 1) {
+                for (let diaDisponivel of regraAtendimento.horario.diasDisponiveis) {
+                    if (!Number.isInteger(diaDisponivel) || diaDisponivel < 1 || diaDisponivel > 7) {
+                        msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento dia da semana disponivel inválido.';
+                    }
+                }
+            }
+
+            if (regraAtendimento.horario.intervalos.length < 1) {
+                msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem intervalos.';
+            } else {
+                for (let intervalo of regraAtendimento.horario.intervalos) {
+                    if (!intervalo.inicio || !intervalo.fim) {
+                        msg = msg + 'Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento com intervalo sem horário de início ou fim.';
+                        break;
+                    }
+                }
             }
 
             if (!msg) {

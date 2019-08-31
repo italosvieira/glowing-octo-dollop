@@ -1,6 +1,6 @@
 import {Module} from '@nestjs/common';
-import {RegraAtendimentoController} from "./regra-atendimento.controller";
-import {RegraAtendimentoService} from "./regra-atendimento.service";
+import {RegraAtendimentoController} from './regra-atendimento.controller';
+import {RegraAtendimentoService} from './regra-atendimento.service';
 
 @Module({
     controllers: [RegraAtendimentoController],
