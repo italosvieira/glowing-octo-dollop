@@ -237,30 +237,6 @@ export class RegraAtendimentoService {
         });
     }
 
-    /*async delete(regraDeAtendimento: RegraAtendimento) {
-        return lock(this.caminhoArquivoBanco).then(async () => {
-            if (regraDeAtendimento.id) {
-                const listaAtendimentos = (await this.lerBanco()).filter(atd => atd.id !== regraDeAtendimento.id);
-                await this.escreveNoBanco(listaAtendimentos);
-                await unlock(this.caminhoArquivoBanco);
-                this.logger.log('Regra de atendimento removida pelo id com sucesso. Regra de Atendimento: ' + JSON.stringify(regraDeAtendimento));
-                return 'Regra de atendimento removida pelo id com sucesso. Regra de Atendimento: ' + JSON.stringify(regraDeAtendimento);
-            } else if (regraDeAtendimento.nomeDaRegra) {
-                const listaAtendimentos = (await this.lerBanco()).filter(atd => atd.nomeDaRegra !== regraDeAtendimento.nomeDaRegra);
-                await this.escreveNoBanco(listaAtendimentos);
-                await unlock(this.caminhoArquivoBanco);
-                this.logger.log('Regra de atendimento removida pelo nome da regra com sucesso. Regra de Atendimento: ' + JSON.stringify(regraDeAtendimento));
-                return 'Regra de atendimento removida pelo nome da regra com sucesso. Regra de Atendimento: ' + JSON.stringify(regraDeAtendimento);
-            } else {
-                throw new HttpException('Não foi possível remover a regra de atendimento passada. Tem certeza que o id ou o nome da regra estão corretos? Regra de atendimento: ' + JSON.stringify(regraDeAtendimento), HttpStatus.BAD_REQUEST);
-            }
-        }).catch(async e => {
-            await unlock(this.caminhoArquivoBanco);
-            this.logger.error((e as Error).message);
-            throw e;
-        });
-    }*/
-
     private adicionaIdNovaRegraAtendimento(regraAtendimento: RegraAtendimento, listaAtendimentos: RegraAtendimento[]) {
         if (listaAtendimentos.length < 1) {
             regraAtendimento.id = 1;
