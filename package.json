@@ -11,9 +11,9 @@
   },
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/server.ts",
+    "test": "jest",
     "build": "rm -rf dist && tsc -p tsconfig.json",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
-    "install-prod": "rm -rf node_modules && npm install --only=prod"
+    "lint": "tslint -p tsconfig.json -c tslint.json"
   },
   "dependencies": {
     "@nestjs/common": "6.5.3",
