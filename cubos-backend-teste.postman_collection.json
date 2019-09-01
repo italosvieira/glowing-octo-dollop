@@ -1,0 +1,223 @@
+{
+	"info": {
+		"_postman_id": "0bebc17a-b683-4c3b-afdd-28a2d453898d",
+		"name": "cubos-backend-teste",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Listar regras",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Horários disponíveis",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"inicio\": \"29-08-2019\",\n\t\"fim\": \"31-08-2019\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento/intervalo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento",
+						"intervalo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apagar Regra Por Id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 1,\n\t\"nomeDaRegra\": \"\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apagar Regra Por Nome Da Regra",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"\",\n\t\"nomeDaRegra\": \"Regra 02\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastro de regra de atendimento(Semanal)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"\",\n\t\"nomeDaRegra\": \"Regra 01\",\n\t\"tipoRegraAtendimento\": \"S\",\n\t\"horario\":\n\t\t{\n\t\t\t\"dia\": \"\",\n\t\t\t\"diasDisponiveis\": [2, 3, 4],\n\t\t\t\"intervalos\": [\n\t\t\t\t{\n\t\t\t\t\t\"inicio\": \"13:00\",\n\t\t\t\t\t\"fim\": \"15:00\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastro de regra de atendimento(Diário)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"\",\n\t\"nomeDaRegra\": \"Regra 02\",\n\t\"tipoRegraAtendimento\": \"D\",\n\t\"horario\":\n\t\t{\n\t\t\t\"dia\": \"\",\n\t\t\t\"diasDisponiveis\": [],\n\t\t\t\"intervalos\": [\n\t\t\t\t{\n\t\t\t\t\t\"inicio\": \"13:00\",\n\t\t\t\t\t\"fim\": \"15:00\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastro de regra de atendimento(Unico Dia)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": \"\",\n\t\"nomeDaRegra\": \"Regra 03\",\n\t\"tipoRegraAtendimento\": \"U\",\n\t\"horario\":\n\t\t{\n\t\t\t\"dia\": \"30-08-2019\",\n\t\t\t\"diasDisponiveis\": [],\n\t\t\t\"intervalos\": [\n\t\t\t\t{\n\t\t\t\t\t\"inicio\": \"13:00\",\n\t\t\t\t\t\"fim\": \"15:00\"\n\t\t\t\t}\n\t\t\t]\n\t\t}\n\t\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/regra-atendimento",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"regra-atendimento"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
