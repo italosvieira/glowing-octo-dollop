@@ -1,5 +1,5 @@
 import * as path from 'path';
-import  * as moment from 'moment';
+import * as moment from 'moment';
 import {HttpException, HttpStatus, Injectable, Logger} from '@nestjs/common';
 import {RegraAtendimento} from './regra-atendimento.model';
 import {appendFile, readFile, truncate} from 'fs-extra';
@@ -42,7 +42,7 @@ export class RegraAtendimentoService {
                 const listaRetorno = new Array<Horario>();
 
                 if (listaAtendimentos) {
-                    for (let regraAtendimento of listaAtendimentos) {
+                    for (const regraAtendimento of listaAtendimentos) {
                         if (regraAtendimento.tipoRegraAtendimento === 'D') {
                             delete regraAtendimento.horario.diasDisponiveis;
                             delete regraAtendimento.horario.dia;
@@ -51,7 +51,7 @@ export class RegraAtendimentoService {
                             const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY').isoWeekday();
                             const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY').isoWeekday();
 
-                            for (let diaDaSemana of regraAtendimento.horario.diasDisponiveis) {
+                            for (const diaDaSemana of regraAtendimento.horario.diasDisponiveis) {
                                 if (diaDaSemana >= diaDaSemanaInicio && diaDaSemana <= diaDaSemanaFim) {
                                     delete regraAtendimento.horario.diasDisponiveis;
                                     delete regraAtendimento.horario.dia;
@@ -109,7 +109,7 @@ export class RegraAtendimentoService {
             }
 
             if (regraAtendimento.tipoRegraAtendimento === 'S') {
-                for (let diaDisponivel of regraAtendimento.horario.diasDisponiveis) {
+                for (const diaDisponivel of regraAtendimento.horario.diasDisponiveis) {
                     if (!Number.isInteger(diaDisponivel) || diaDisponivel < 1 || diaDisponivel > 7) {
                         throw new HttpException('Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento dia da semana disponivel inválido.', HttpStatus.BAD_REQUEST);
                     }
@@ -119,7 +119,7 @@ export class RegraAtendimentoService {
             if (!regraAtendimento.horario.intervalos || regraAtendimento.horario.intervalos.length < 1) {
                 throw new HttpException('Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento sem intervalos.', HttpStatus.BAD_REQUEST);
             } else {
-                for (let intervalo of regraAtendimento.horario.intervalos) {
+                for (const intervalo of regraAtendimento.horario.intervalos) {
                     if (!intervalo.inicio || !intervalo.fim) {
                         throw new HttpException('Erro ao salvar regra de atendimento. Não é possível salvar uma regra de atendimento com intervalo sem horário de início ou fim.', HttpStatus.BAD_REQUEST);
                     }
@@ -148,7 +148,7 @@ export class RegraAtendimentoService {
             } else {
                 let disponibilidade = 'Disponivel todas as semanas nos dias:';
 
-                for (let dia of regraAtendimento.horario.diasDisponiveis) {
+                for (const dia of regraAtendimento.horario.diasDisponiveis) {
                     if (dia === 1) {
                         disponibilidade = disponibilidade + ' Segunda-feira';
                     } else if (dia === 2) {
