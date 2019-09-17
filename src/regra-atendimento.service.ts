@@ -48,16 +48,18 @@ export class RegraAtendimentoService {
                             delete regraAtendimento.horario.dia;
                             listaRetorno.push(regraAtendimento.horario);
                         } else if (regraAtendimento.tipoRegraAtendimento === 'S') {
-                            const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY').isoWeekday();
-                            const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY').isoWeekday();
+                            const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY');
+                            const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY');
 
-                            for (const diaDaSemana of regraAtendimento.horario.diasDisponiveis) {
-                                if (diaDaSemana >= diaDaSemanaInicio && diaDaSemana <= diaDaSemanaFim) {
+                            while (diaDaSemanaInicio.isSameOrBefore(diaDaSemanaFim)) {
+                                if (regraAtendimento.horario.diasDisponiveis.includes(diaDaSemanaInicio.isoWeekday())) {
                                     delete regraAtendimento.horario.diasDisponiveis;
                                     delete regraAtendimento.horario.dia;
                                     listaRetorno.push(regraAtendimento.horario);
                                     break;
                                 }
+
+                                diaDaSemanaInicio.add(1, 'day');
                             }
                         } else if (regraAtendimento.tipoRegraAtendimento === 'U') {
                             if (moment(regraAtendimento.horario.dia, 'DD-MM-YYYY').isBetween(moment(intervalo.inicio, 'DD-MM-YYYY'),
