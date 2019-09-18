@@ -6,6 +6,7 @@ import {appendFile, readFile, truncate} from 'fs-extra';
 import {check, lock, unlock} from 'proper-lockfile';
 import {Intervalo} from './intervalos-regra-atendimento';
 import {Horario} from './horario-regra-atendimento.model';
+import {RetornoIntervaloRegraAtendimentoModel} from './retorno-intervalo-regra-atendimento.model';
 
 @Injectable()
 export class RegraAtendimentoService {
@@ -38,40 +39,35 @@ export class RegraAtendimentoService {
 
         return check(this.caminhoArquivoBanco).then(async (isLocked) => {
             if (!isLocked) {
-                const listaAtendimentos = await this.lerBanco();
-                const listaRetorno = new Array<Horario>();
+                const listaRegraDeAtendimentos = await this.lerBanco();
+                const listaRetorno = new Array<RetornoIntervaloRegraAtendimentoModel>();
 
-                if (listaAtendimentos) {
-                    for (const regraAtendimento of listaAtendimentos) {
-                        if (regraAtendimento.tipoRegraAtendimento === 'D') {
-                            delete regraAtendimento.horario.diasDisponiveis;
-                            delete regraAtendimento.horario.dia;
-                            listaRetorno.push(regraAtendimento.horario);
-                        } else if (regraAtendimento.tipoRegraAtendimento === 'S') {
-                            const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY');
-                            const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY');
+                if (listaRegraDeAtendimentos) {
+                    for (const regraDeAtendimento of listaRegraDeAtendimentos) {
+                        const diaDaSemanaInicio = moment(intervalo.inicio, 'DD-MM-YYYY');
+                        const diaDaSemanaFim = moment(intervalo.fim, 'DD-MM-YYYY');
 
+                        if (regraDeAtendimento.tipoRegraAtendimento === 'D') {
                             while (diaDaSemanaInicio.isSameOrBefore(diaDaSemanaFim)) {
-                                if (regraAtendimento.horario.diasDisponiveis.includes(diaDaSemanaInicio.isoWeekday())) {
-                                    delete regraAtendimento.horario.diasDisponiveis;
-                                    delete regraAtendimento.horario.dia;
-                                    listaRetorno.push(regraAtendimento.horario);
-                                    break;
+                                listaRetorno.push(new RetornoIntervaloRegraAtendimentoModel(diaDaSemanaInicio.format('DD-MM-YYYY'), regraDeAtendimento.horario.intervalos));
+                                diaDaSemanaInicio.add(1, 'day');
+                            }
+                        } else if (regraDeAtendimento.tipoRegraAtendimento === 'U') {
+                            if (moment(regraDeAtendimento.horario.dia, 'DD-MM-YYYY').isBetween(moment(intervalo.inicio, 'DD-MM-YYYY'),
+                                moment(intervalo.fim, 'DD-MM-YYYY'), 'days', '[]')) {
+                                listaRetorno.push(new RetornoIntervaloRegraAtendimentoModel(regraDeAtendimento.horario.dia, regraDeAtendimento.horario.intervalos));
+                            }
+                        } else if (regraDeAtendimento.tipoRegraAtendimento === 'S') {
+                            while (diaDaSemanaInicio.isSameOrBefore(diaDaSemanaFim)) {
+                                if (regraDeAtendimento.horario.diasDisponiveis.includes(diaDaSemanaInicio.isoWeekday())) {
+                                    listaRetorno.push(new RetornoIntervaloRegraAtendimentoModel(diaDaSemanaInicio.format('DD-MM-YYYY'), regraDeAtendimento.horario.intervalos));
                                 }
 
                                 diaDaSemanaInicio.add(1, 'day');
                             }
-                        } else if (regraAtendimento.tipoRegraAtendimento === 'U') {
-                            if (moment(regraAtendimento.horario.dia, 'DD-MM-YYYY').isBetween(moment(intervalo.inicio, 'DD-MM-YYYY'),
-                                moment(intervalo.fim, 'DD-MM-YYYY'), 'days', '[]')) {
-                                delete regraAtendimento.horario.diasDisponiveis;
-                                delete regraAtendimento.horario.dia;
-                                listaRetorno.push(regraAtendimento.horario);
-                            }
                         }
                     }
                 }
-
                 return listaRetorno;
             } else {
                 return new Array<RegraAtendimento>();
